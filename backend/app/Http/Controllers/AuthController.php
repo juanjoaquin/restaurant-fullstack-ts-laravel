@@ -11,10 +11,17 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
+
+        $validate = $request->validate([
+            'name' => 'required|string|min:1|max:50',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required'
+        ]);
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validate['name'],
+            'email' => $validate['email'],
+            'password' => Hash::make($validate['password']),
         ]);
 
 
@@ -51,9 +58,35 @@ class AuthController extends Controller
         ], 200)->withCookie($cookie);
     }
 
+    public function index() 
+    {
+        $user = User::all();
+
+        if($user->isEmpty()) {
+            return response()->json([
+                'message' => 'Mozo no encontrado'
+            ], 404);
+        }
+
+        return response()->json($user, 200);
+    }
+
     public function user()
     {
-        return Auth::user();
+        $user = auth::user();
+
+
+        if (!$user) {
+            return response()->json([
+                'error' => 'Not authenticated',
+                'message' => 'Please log in to access this resource.'
+            ], 401);
+        }
+    
+        return response()->json($user, 200);
+        // return response()->json([
+        //     'user' => $user
+        // ], 200);
     }
 
     public function logout(Request $request)
@@ -66,4 +99,5 @@ class AuthController extends Controller
             'message' => 'Logged out successfully!'
         ])->withCookie($cookie);
     }
+    
 }

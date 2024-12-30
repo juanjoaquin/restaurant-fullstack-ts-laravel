@@ -15,4 +15,9 @@ class Cliente extends Model
     {
         return $this->hasMany(Pedido::class);
     }
+
+    public function mesas()
+    {
+        return $this->hasMany(Mesa::class);
+    }
 }

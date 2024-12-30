@@ -26,8 +26,15 @@ class Pedido extends Model
         return $this->belongsTo(Cliente::class);
     }
 
-    public function pago()
+    public function pagos()
     {
-        return $this->hasOne(Pago::class);
+        return $this->hasMany(Pago::class);
+    }
+
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class, 'pedidos_menu')
+            ->withPivot('cantidad', 'notas') // Campos adicionales en la tabla pivote
+            ->withTimestamps();
     }
 }
